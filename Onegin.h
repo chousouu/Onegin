@@ -4,13 +4,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <strings.h>
+#include <sys\stat.h>
+
 
 int CountString(char *buffer);
-int CountSymbols(FILE *fw);
-void SpaceRemoveAndCopyToArr(char* buffer, FILE *fp);
+int CountSymbols();
+char * CopyToArr(FILE *fp, int size);
+char *SpaceRemoveAndCopyToArr(int size, FILE *fp);
 void GetString(char *buffer, struct Strings *arr, int size);
+Strings *FillInStruct(char *buffer, int size);
 
-int LowerCase(char c);
+char LowerCase(char c);
 int Compare(char *s1, char *s2);
 void MSort(struct Strings *arr, int l, int r) ;
 void Merge(struct Strings *arr, int l, int m, int r);

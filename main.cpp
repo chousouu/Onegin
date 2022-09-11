@@ -3,27 +3,30 @@
 int main()
 {
     FILE *fp = fopen("Hamlet.txt", "r");
-    char *buffer = (char*)calloc(CountSymbols(fp), sizeof(char));
+    int SymbolsCnt = CountSymbols();  
+
+    printf("%d\n", SymbolsCnt);
+
+    char *buffer = SpaceRemoveAndCopyToArr(SymbolsCnt, fp);
+
     printf("allocated\n");
 
-    SpaceRemoveAndCopyToArr(buffer, fp);
-    printf("remied\n");
+    //printf("%s", buffer);
 
     int size = CountString(buffer);
     printf("counted, %d\n", size);
-  
-    struct Strings * arr = (struct Strings *)calloc(size, sizeof(struct Strings)); 
-
-    GetString(buffer, arr, size);
+    
+    Strings *arr = FillInStruct(buffer, size);
     printf("string\n");
 
-    
-    MSort(arr, 0, size);
+
+    //qsort(arr, size, sizeof(struct Strings), Compare);
+ 
+    MSort(arr, 0, size - 1);
     printf("SORT");
 
-    PrintStrings(arr, size - 1);
+    PrintStrings(arr, size);
     printf("PRINTD");
-
     free(arr);
 
 }

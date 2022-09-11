@@ -1,11 +1,12 @@
 #include "Onegin.h"
 
-void SpaceRemoveAndCopyToArr(char* buffer, FILE *fp)
+char *SpaceRemoveAndCopyToArr(int size, FILE *fp)
 {
-    rewind(fp);
     int c = 0; 
     int check = 0;
     int i = 0;
+
+    char *buffer = (char *)calloc(size, sizeof(char));
 
     while((c = fgetc(fp)) != EOF)
     {
@@ -36,15 +37,25 @@ void SpaceRemoveAndCopyToArr(char* buffer, FILE *fp)
     }
     *(buffer + i) = '\n';
     *(buffer + i + 1) = '\0';
-    rewind(fp);
+    return buffer;
        
 }
 
-int CountSymbols(FILE *fw)
+Strings *FillInStruct(char *buffer, int size)
 {
-    fseek(fw, 0, SEEK_END);
+    struct Strings * arr = (struct Strings *)calloc(size, sizeof(struct Strings)); 
+
+    GetString(buffer, arr, size);
+
+    return arr;
+}
+
+int CountSymbols()
+{
+    struct stat buff;
+    stat("Hamlet.txt", &buff);
     
-    return (int)ftell(fw); 
+    return buff.st_size; 
 }
 
 void GetString(char *buffer, struct Strings *arr, int size)
@@ -80,7 +91,7 @@ int Compare(char *s1, char *s2)
 {
     int i = 0;
     
-    while(s1[i]!= '\0' && s2[i] != '\0')
+    while(1)
     {
         char char1 = LowerCase(s1[i]);
         char char2 = LowerCase(s2[i]);
@@ -100,23 +111,6 @@ int Compare(char *s1, char *s2)
             return -1;
         }
     }
-
-    int sizes1 = strlen(s1);
-    int sizes2 = strlen(s2);
-
-    if(sizes1 > sizes2)
-    {
-        return 1;
-    } 
-    else if (sizes1 < sizes2)
-    {
-        return -1;
-    }
-    else 
-    {
-        return 0; //odinakovie stroki
-    }
-
 }
 
 void Merge(struct Strings *arr, int l, int m, int r) // merge sort 
@@ -132,37 +126,36 @@ void Merge(struct Strings *arr, int l, int m, int r) // merge sort
     for(int i = 0; i < nLeft; i++)
     {
         L[i] = arr[l + i].string;
-        printf("%d. %s\n", l + i, L[i]);
+        //printf("%d. %s\n", l + i, L[i]);
     }
     for(int j = 0; j < nRight; j++)
     {
         R[j] = arr[m + 1 + j].string;
-        printf("%d.%s\n", m + 1 + j, R[j]);
+      //  printf("%d.%s\n", m + 1 + j, R[j]);
     }
 
-    printf("FILLED\n");
     int i = 0, j = 0, k = 0;
 
     
     while(i < nLeft && j < nRight)
     {
-        printf("%d\n", Compare(L[i], R[j]));
+//        printf("%d\n", Compare(L[i], R[j]));
 
         if(Compare(L[i], R[j]) != -1)
         {
             arr[k].string = L[i];
-            printf("%s %s\n", arr[k].string, L[i]);
+            //printf("%s %s\n", arr[k].string, L[i]);
             i++;
         }
         else if(Compare(L[i], R[j]) == -1)
         {
             arr[k].string = R[j];
-            printf("%s %s\n", arr[k].string, R[j]);
+          //  printf("%s %s\n", arr[k].string, R[j]);
             j++;
         }
         k++;
     } 
-    printf("ASDADASD\n");
+  //  printf("ASDADASD\n");
     while(i < nLeft)
     {
         arr[k].string = L[i];
@@ -185,19 +178,19 @@ void MSort(struct Strings *arr, int l, int r)
         
         MSort(arr, l, m);
 
-        printf("MSORT1\n");
+       // printf("MSORT1\n");
 
         MSort(arr, m + 1, r);
-        printf("MSORT2\n");
+        //printf("MSORT2\n");
 
-        printf("Merge l %d, m %d, r %d\n", l, m, r);
+       // printf("Merge l %d, m %d, r %d\n", l, m, r);
         Merge(arr, l, m, r);
-        printf("MERGE\n");
+     //   printf("MERGE\n");
 
     }
 }
 
-int LowerCase(char c)
+char LowerCase(char c)
 {
     if ((c >= 'A') && (c <= 'Z'))
     {
@@ -208,8 +201,11 @@ int LowerCase(char c)
 
 void PrintStrings(struct Strings *arr, int size)
 {
+    FILE *fp = fopen("Hamlet2.txt", "w");
     for(int i = 0; i < size; i++)
     {
-        printf("%s", arr[i].string);
+        fwrite(arr[i].string, sizeof(char), arr[i].size, fp);
+        fputc('\n', fp);    
     }
-}
+    fclose(fp);
+} // printstrings needs to receive file name; -> make func that opens in "W" / "r" mode file 
