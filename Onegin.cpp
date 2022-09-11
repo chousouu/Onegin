@@ -36,17 +36,11 @@ void OddSpaceRemoveArray(char *buffer)
     }
 
     buffer[k] = '\n';
-    for(int z = k + 1; z < i; z++) // put \0 on everything that we havent rewritten
-    {
-        buffer[z] = '\0';
-    }
 }
 
 char *CopyToArr(FILE *fp, int size)
 {
     char *buffer = (char *)calloc(size, sizeof(char));
-
-    fp = OpenWriteFile("Hamlet.txt", "r");
 
     int PutZero = fread(buffer, sizeof(char), size, fp);
     buffer[PutZero] = '\0';
@@ -54,12 +48,16 @@ char *CopyToArr(FILE *fp, int size)
     return buffer;
 }
 
-FILE *OpenWriteFile(const char *name, const char *mode)
+FILE *OpenFile()
 {
-    FILE *fp = fopen(name, mode);
+    char name[50]; 
+    printf("Write the file name you want to sort(Don't forget to put .txt at the end): ");
+    scanf("%s", name);
+
+    FILE *fp = fopen(name, "r");
     if(fp == NULL)
     {
-        printf("Could not open the file \"%s.txt\"", name);
+        printf("Could not open the file \"%s.txt\"\n", name);
     }
     return fp;
 }
@@ -101,7 +99,7 @@ int CountString(char *buffer)
     int count = 0;
     for(int i = 0; *(buffer + i) != '\0'; i++) 
     {
-        if(*(buffer + i) == '\n')
+        if(buffer[i] == '\n')
         {
             count++;
         }
@@ -112,40 +110,48 @@ int CountString(char *buffer)
 
 int Compare(const void *s1, const void *s2)
 {
-    int i = 0;
-    int first_move = 0;
-    int second_move = 0;
     const struct Strings *z1 = (const struct Strings *)s1;
     const struct Strings *z2 = (const struct Strings *)s2;
-    while(1)
+    for(int i = 0, j = 0, k = 0; (i + j) < z1->size && (i + k) < z2->size; i++)
     {
-        int char1 = LowerCase(*(z1->string + i + first_move)); 
-        int char2 = LowerCase(*(z2->string + i + second_move));
+        int char1 = LowerCase(z1->string[i + j]); 
+        int char2 = LowerCase(z2->string[i + k]);
         if(char1 == -1)
         {
-            first_move++;
+            j++;
             continue;
         }
         if(char2 == -1)
         {
-            second_move++;
+            k++;
             continue;
         }
 
-        if(char1 == char2)
+        int razn = char1 - char2;
+        if(razn == 0)
         {
-            i++;
             continue;
         }
-
-        if(char1 > char2)
+        else if(razn > 0)
         {
             return 1; 
         }
-        else if(char1 < char2)
+        else 
         {
             return -1;
         }
+    }
+    if(z1->size > z2->size)
+    {
+        return 1;
+    }
+    else if(z1->size < z2->size)
+    {
+        return -1;
+    }
+    else 
+    {
+        return 0;
     }
 }
 

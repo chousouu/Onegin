@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <strings.h>
 #include <sys\stat.h>
-
+#include <assert.h>
 
 int CountString(char *buffer);
 int CountSymbols();
@@ -19,7 +19,7 @@ int Compare(const void *s1, const void *s2);
 void MSort(struct Strings *arr, int l, int r);
 void Merge(struct Strings *arr, int l, int m, int r);
 void PrintStrings(struct Strings *arr, int size);
-FILE *OpenWriteFile(const char *name, const char *mode);
+FILE *OpenFile();
 
 struct Strings 
 {
