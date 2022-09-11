@@ -1,19 +1,18 @@
 #include "Onegin.h"
 
-char *SpaceRemoveAndCopyToArr(int size, FILE *fp)
+void OddSpaceRemoveArray(char *buffer)
 {
-    int c = 0; 
+    char c = 0; 
     int check = 0;
-    int i = 0;
+    int i = 0; //for before array
+    int k = 0; // counter for after array
 
-    char *buffer = (char *)calloc(size, sizeof(char));
-
-    while((c = fgetc(fp)) != EOF)
+    while((c = buffer[i++]) != '\0')
     {
         if(c == '\n' && check == 0)
         {
-            *(buffer + i) = c;
-            i++;
+            buffer[k] = c;
+            k++;
             check = 1;
             
         }
@@ -29,16 +28,40 @@ char *SpaceRemoveAndCopyToArr(int size, FILE *fp)
             }
             else 
             {
-                *(buffer + i) = c;
-                i++;
+                buffer[k] = c;
+                k++;
                 check = 0;
             }
         }
     }
-    *(buffer + i) = '\n';
-    *(buffer + i + 1) = '\0';
+
+    buffer[k] = '\n';
+    for(int z = k + 1; z < i; z++) // put \0 on everything that we havent rewritten
+    {
+        buffer[z] = '\0';
+    }
+}
+
+char *CopyToArr(FILE *fp, int size)
+{
+    char *buffer = (char *)calloc(size, sizeof(char));
+
+    fp = OpenWriteFile("Hamlet.txt", "r");
+
+    int PutZero = fread(buffer, sizeof(char), size, fp);
+    buffer[PutZero] = '\0';
+
     return buffer;
-       
+}
+
+FILE *OpenWriteFile(const char *name, const char *mode)
+{
+    FILE *fp = fopen(name, mode);
+    if(fp == NULL)
+    {
+        printf("Could not open the file \"%s.txt\"", name);
+    }
+    return fp;
 }
 
 Strings *FillInStruct(char *buffer, int size)
@@ -87,14 +110,27 @@ int CountString(char *buffer)
     return count; 
 }
 
-int Compare(char *s1, char *s2)
+int Compare(const void *s1, const void *s2)
 {
     int i = 0;
-    
+    int first_move = 0;
+    int second_move = 0;
+    const struct Strings *z1 = (const struct Strings *)s1;
+    const struct Strings *z2 = (const struct Strings *)s2;
     while(1)
     {
-        char char1 = LowerCase(s1[i]);
-        char char2 = LowerCase(s2[i]);
+        int char1 = LowerCase(*(z1->string + i + first_move)); 
+        int char2 = LowerCase(*(z2->string + i + second_move));
+        if(char1 == -1)
+        {
+            first_move++;
+            continue;
+        }
+        if(char2 == -1)
+        {
+            second_move++;
+            continue;
+        }
 
         if(char1 == char2)
         {
@@ -112,6 +148,7 @@ int Compare(char *s1, char *s2)
         }
     }
 }
+
 
 void Merge(struct Strings *arr, int l, int m, int r) // merge sort 
 {
@@ -190,13 +227,20 @@ void MSort(struct Strings *arr, int l, int r)
     }
 }
 
-char LowerCase(char c)
+int LowerCase(char c)
 {
     if ((c >= 'A') && (c <= 'Z'))
     {
         return c + ('a' - 'A');    
     }
-    return c;
+    if((c >= 'a') && (c <= 'z'))
+    {
+        return c;
+    }
+    else 
+    {
+        return -1;
+    }
 }
 
 void PrintStrings(struct Strings *arr, int size)

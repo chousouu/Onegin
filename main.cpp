@@ -2,32 +2,30 @@
 
 int main()
 {
-    FILE *fp = fopen("Hamlet.txt", "r");
+    FILE *fp = OpenWriteFile("Hamlet.txt", "r");
+
     int SymbolsCnt = CountSymbols();  
 
-    printf("%d\n", SymbolsCnt);
+    char *buffer = CopyToArr(fp, SymbolsCnt);
+   // printf("allocated\n");
 
-    char *buffer = SpaceRemoveAndCopyToArr(SymbolsCnt, fp);
-
-    printf("allocated\n");
-
-    //printf("%s", buffer);
+    OddSpaceRemoveArray(buffer);
+    // printf("removed");
 
     int size = CountString(buffer);
-    printf("counted, %d\n", size);
+    // printf("counted, %d\n", size);
     
     Strings *arr = FillInStruct(buffer, size);
-    printf("string\n");
+    // printf("string\n");
 
 
-    //qsort(arr, size, sizeof(struct Strings), Compare);
- 
+    qsort(arr, size, sizeof(struct Strings), Compare);
+ /*
     MSort(arr, 0, size - 1);
     printf("SORT");
-
+*/
     PrintStrings(arr, size);
-    printf("PRINTD");
+    // printf("PRINTD");
     free(arr);
 
 }
-

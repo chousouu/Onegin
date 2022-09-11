@@ -9,16 +9,17 @@
 
 int CountString(char *buffer);
 int CountSymbols();
-char * CopyToArr(FILE *fp, int size);
-char *SpaceRemoveAndCopyToArr(int size, FILE *fp);
+char *CopyToArr(FILE *fp, int size);
+void OddSpaceRemoveArray(char *buffer);
 void GetString(char *buffer, struct Strings *arr, int size);
 Strings *FillInStruct(char *buffer, int size);
 
-char LowerCase(char c);
-int Compare(char *s1, char *s2);
-void MSort(struct Strings *arr, int l, int r) ;
+int LowerCase(char c);
+int Compare(const void *s1, const void *s2);
+void MSort(struct Strings *arr, int l, int r);
 void Merge(struct Strings *arr, int l, int m, int r);
 void PrintStrings(struct Strings *arr, int size);
+FILE *OpenWriteFile(const char *name, const char *mode);
 
 struct Strings 
 {
