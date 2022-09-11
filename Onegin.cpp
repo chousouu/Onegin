@@ -161,7 +161,6 @@ void Merge(struct Strings *arr, int l, int m, int r) // merge sort
     int nLeft = m - l + 1;
     int nRight = r - m;
 
-    //printf("nLEFT RIGHT %d %d\n", nLeft, nRight);
 
     char *R[nRight];
     char *L[nLeft];
@@ -169,12 +168,10 @@ void Merge(struct Strings *arr, int l, int m, int r) // merge sort
     for(int i = 0; i < nLeft; i++)
     {
         L[i] = arr[l + i].string;
-        //printf("%d. %s\n", l + i, L[i]);
     }
     for(int j = 0; j < nRight; j++)
     {
         R[j] = arr[m + 1 + j].string;
-      //  printf("%d.%s\n", m + 1 + j, R[j]);
     }
 
     int i = 0, j = 0, k = 0;
@@ -182,23 +179,19 @@ void Merge(struct Strings *arr, int l, int m, int r) // merge sort
     
     while(i < nLeft && j < nRight)
     {
-//        printf("%d\n", Compare(L[i], R[j]));
 
         if(Compare(L[i], R[j]) != -1)
         {
             arr[k].string = L[i];
-            //printf("%s %s\n", arr[k].string, L[i]);
             i++;
         }
         else if(Compare(L[i], R[j]) == -1)
         {
             arr[k].string = R[j];
-          //  printf("%s %s\n", arr[k].string, R[j]);
             j++;
         }
         k++;
     } 
-  //  printf("ASDADASD\n");
     while(i < nLeft)
     {
         arr[k].string = L[i];
@@ -221,14 +214,10 @@ void MSort(struct Strings *arr, int l, int r)
         
         MSort(arr, l, m);
 
-       // printf("MSORT1\n");
 
         MSort(arr, m + 1, r);
-        //printf("MSORT2\n");
 
-       // printf("Merge l %d, m %d, r %d\n", l, m, r);
         Merge(arr, l, m, r);
-     //   printf("MERGE\n");
 
     }
 }
