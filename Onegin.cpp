@@ -38,7 +38,7 @@ void OddSpaceRemoveArray(char *buffer)
     buffer[k] = '\n';
 }
 
-char *CopyToArr(FILE *fp, int size)
+char *ReadToBuffer(FILE *fp, int size) 
 {
     char *buffer = (char *)calloc(size, sizeof(char));
 
@@ -48,18 +48,38 @@ char *CopyToArr(FILE *fp, int size)
     return buffer;
 }
 
-FILE *OpenFile()
+int AnalyzeInput(int argcount, const char **argument, struct Input *info)
 {
-    char name[50]; 
-    printf("Write the file name you want to sort(Don't forget to put .txt at the end): ");
-    scanf("%s", name);
+    int check = 0;
+    info->mode = 0; // normal sort
+    for (int i = 0; i < argcount; i++)
+    {
+        if(strcmp("-i", argument[i + 1]) == 0)
+        {
+            info->inputfile = argument[i + 1];
+            check++;
+        }
+        if(strcmp("-o", argument[i + 1]) == 0)
+        {
+            info->outputfile = argument[i + 1];
+            check++;
+        }
+        if(strcmp("-r", argument[i + 1]) == 0)
+        {
+            info->mode = 1;
+        }
+    }
+    return check;    
+}
 
+char *OpenFile(const char *name)
+{
     FILE *fp = fopen(name, "r");
     if(fp == NULL)
     {
         printf("Could not open the file \"%s.txt\"\n", name);
     }
-    return fp;
+    return ReadToBuffer(fp, CountSymbols(name));
 }
 
 Strings *FillInStruct(char *buffer, int size)
@@ -71,10 +91,10 @@ Strings *FillInStruct(char *buffer, int size)
     return arr;
 }
 
-int CountSymbols()
+int CountSymbols(const char *name)
 {
     struct stat buff;
-    stat("Hamlet.txt", &buff);
+    stat(name, &buff);
     
     return buff.st_size; 
 }
@@ -112,114 +132,56 @@ int Compare(const void *s1, const void *s2)
 {
     const struct Strings *z1 = (const struct Strings *)s1;
     const struct Strings *z2 = (const struct Strings *)s2;
-    for(int i = 0, j = 0, k = 0; (i + j) < z1->size && (i + k) < z2->size; i++)
+
+    for(int i = 0, j = 0; i <= z1->size && j <= z2->size; i++, j++)
     {
-        int char1 = LowerCase(z1->string[i + j]); 
-        int char2 = LowerCase(z2->string[i + k]);
-        if(char1 == -1)
+        while(!isalpha(z1->string[i]))
         {
-            j++;
-            continue;
-        }
-        if(char2 == -1)
-        {
-            k++;
-            continue;
-        }
-
-        int razn = char1 - char2;
-        if(razn == 0)
-        {
-            continue;
-        }
-        else if(razn > 0)
-        {
-            return 1; 
-        }
-        else 
-        {
-            return -1;
-        }
-    }
-    if(z1->size > z2->size)
-    {
-        return 1;
-    }
-    else if(z1->size < z2->size)
-    {
-        return -1;
-    }
-    else 
-    {
-        return 0;
-    }
-}
-
-
-void Merge(struct Strings *arr, int l, int m, int r) // merge sort 
-{
-    int nLeft = m - l + 1;
-    int nRight = r - m;
-
-
-    char *R[nRight];
-    char *L[nLeft];
-
-    for(int i = 0; i < nLeft; i++)
-    {
-        L[i] = arr[l + i].string;
-    }
-    for(int j = 0; j < nRight; j++)
-    {
-        R[j] = arr[m + 1 + j].string;
-    }
-
-    int i = 0, j = 0, k = 0;
-
-    
-    while(i < nLeft && j < nRight)
-    {
-
-        if(Compare(L[i], R[j]) != -1)
-        {
-            arr[k].string = L[i];
             i++;
         }
-        else if(Compare(L[i], R[j]) == -1)
+        while(!isalpha(z2->string[j]))
         {
-            arr[k].string = R[j];
             j++;
         }
-        k++;
-    } 
-    while(i < nLeft)
-    {
-        arr[k].string = L[i];
-        i++;
-        k++;
-    }
-    while(j < nRight)
-    {
-        arr[k].string = R[j];
-        j++;
-        k++;
-    }
+
+        int char1 = LowerCase(z1->string[i]); 
+        int char2 = LowerCase(z2->string[j]);
+        int razn = char1 - char2;
+
+        if(razn)
+        {
+            return char1 - char2;
+        }  
+    }  
+    return 0;
 }
 
-void MSort(struct Strings *arr, int l, int r)
-{   
-    if(l < r)
+int CompareFromEnd(const void *s1, const void *s2)
+{
+    const struct Strings *z1 = (const struct Strings *)s1;
+    const struct Strings *z2 = (const struct Strings *)s2;
+
+    for(int i = z1->size, j = z2->size; i >= 0 && j >= 0; i--, j--)
     {
-        int m = l + (r - l) / 2;
-        
-        MSort(arr, l, m);
+        while(!isalpha(z1->string[i]))
+        {
+            i--;
+        }
+        while(!isalpha(z2->string[j]))
+        {
+            j--;
+        }
 
+        int char1 = LowerCase(z1->string[i]); 
+        int char2 = LowerCase(z2->string[j]);
+        int razn = char1 - char2;
 
-        MSort(arr, m + 1, r);
-
-        Merge(arr, l, m, r);
-
-    }
+        if(razn)
+        {
+            return char1 - char2;
+        }  
+    }  
+    return 0;
 }
 
 int LowerCase(char c)
@@ -238,13 +200,23 @@ int LowerCase(char c)
     }
 }
 
-void PrintStrings(struct Strings *arr, int size)
+void PrintStrings(struct Strings *arr, int size, const char *name, int mode)
 {
-    FILE *fp = fopen("Hamlet2.txt", "w");
-    for(int i = 0; i < size; i++)
+    FILE *fp = fopen(name, "w");
+    if(mode)
     {
-        fwrite(arr[i].string, sizeof(char), arr[i].size, fp);
-        fputc('\n', fp);    
+        for(int i = 0; i < size; i++)
+        {
+            fprintf(fp, "%60s\n", arr[i].string);    
+        }
     }
+    else 
+    {
+        for(int i = 0; i < size; i++)
+        {
+            fprintf(fp, "%s\n", arr[i].string);    
+        }
+    }
+    
     fclose(fp);
-} // printstrings needs to receive file name; -> make func that opens in "W" / "r" mode file 
+}  
