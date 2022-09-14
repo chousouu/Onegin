@@ -156,8 +156,11 @@ int Compare(const void *s1, const void *s2)
     return 0;
 }
 
-int CompareFromEnd(struct Strings *z1, struct Strings *z2)
+int CompareFromEnd(const void *s1, const void *s2)
 {
+    const struct Strings *z1 = (const struct Strings *)s1; 
+    const struct Strings *z2 = (const struct Strings *)s2;
+
     for(int i = z1->size, j = z2->size; i >= 0 && j >= 0; i--, j--)
     {
         while(!isalpha(z1->string[i]))
@@ -188,45 +191,45 @@ void swap(char *s1, char *s2)
     s2 = temp;
 }
 
-void quick_sort(struct Strings* p, int left, int right,  int (*CompareFromEnd)(struct Strings *z1, struct Strings *z2)) 
+void quick_sort(struct Strings* p, int left, int right,  int (*CompareFromEnd)(const void *z1, const void *z2))
 {
     int aaa = right - left;
 
     if(aaa == 2)
     {
-        if(CompareFromEnd(&p[left], &p[left + 1]) < 0 )
+        if(CompareFromEnd(p + left, p + left + 1) < 0 )
         {
             swap(p[left].string, p[left + 1].string);
         }
 
-        if(CompareFromEnd(&p[left + 1], &p[right]) < 0)
+        if(CompareFromEnd(p + left + 1, p + right) < 0)
         {
             swap(p[left + 1].string, p[right].string);
         }
-        if(CompareFromEnd(&p[left], &p[right]) < 0)
+        if(CompareFromEnd(p + left, p + right) < 0)
         {
             swap(p[left].string, p[right].string);
         }
     }
     else if(aaa == 1)
     {
-        if(CompareFromEnd(&p[left], &p[right]) < 0)
+        if(CompareFromEnd(p + left, p + right) < 0)
         {
             swap(p[left].string, p[right].string);
         }
     }
 
-    struct Strings *pivot = &p[(left + right) / 2];
+    struct Strings *pivot = p + ((left + right) / 2);
     int i = left;   
     int j = right;
 
     while (i <= j) 
     {
-        while(CompareFromEnd(&p[i], pivot) < 0) 
+        while(CompareFromEnd(p + i, pivot) < 0) 
         {
             ++i;
         }
-        while(CompareFromEnd(&p[j], pivot) > 0) 
+        while(CompareFromEnd(p + j, pivot) > 0) 
         {
             --j;
         }
