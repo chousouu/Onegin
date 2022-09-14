@@ -21,7 +21,8 @@ int main(int argc, const char **argv)
         
         if(info.mode == 0)
         {
-            qsort(arr, size, sizeof(struct Strings), Compare);
+            quick_sort(arr, 0, size - 1, Compare);
+            // qsort(arr, size, sizeof(struct Strings), Compare);
         }
         else 
         {

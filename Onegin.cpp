@@ -194,6 +194,7 @@ void swap(char *s1, char *s2)
 void quick_sort(struct Strings* p, int left, int right,  int (*CompareFromEnd)(const void *z1, const void *z2))
 {
     int aaa = right - left;
+    // printf("ENTERED\n");
 
     if(aaa == 2)
     {
@@ -219,6 +220,7 @@ void quick_sort(struct Strings* p, int left, int right,  int (*CompareFromEnd)(c
         }
     }
 
+    // printf("AAA\n");
     struct Strings *pivot = p + ((left + right) / 2);
     int i = left;   
     int j = right;
@@ -241,6 +243,8 @@ void quick_sort(struct Strings* p, int left, int right,  int (*CompareFromEnd)(c
         }
     }
 
+    // printf("while ij\n");
+
     if (left < j) 
     {
         quick_sort(p, left, j, CompareFromEnd);
@@ -249,6 +253,7 @@ void quick_sort(struct Strings* p, int left, int right,  int (*CompareFromEnd)(c
     {
         quick_sort(p, i, right, CompareFromEnd);
     }
+    // printf("END\n");
 }
 
 int LowerCase(char c)
