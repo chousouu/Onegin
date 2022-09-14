@@ -38,7 +38,7 @@ void OddSpaceRemoveArray(char *buffer)
     buffer[k] = '\n';
 }
 
-char *ReadToBuffer(FILE *fp, int size) 
+char *ReadToBuffer(FILE *fp, int size) //readtobuffer
 {
     char *buffer = (char *)calloc(size, sizeof(char));
 
@@ -52,19 +52,19 @@ int AnalyzeInput(int argcount, const char **argument, struct Input *info)
 {
     int check = 0;
     info->mode = 0; // normal sort
-    for (int i = 0; i < argcount; i++)
+    for (int i = 1; i < argcount; i++)
     {
-        if(strcmp("-i", argument[i + 1]) == 0)
+        if(strncmp("-i", argument[i], 2) == 0)
         {
             info->inputfile = argument[i + 1];
             check++;
         }
-        if(strcmp("-o", argument[i + 1]) == 0)
+        if(strncmp("-o", argument[i], 2) == 0)
         {
             info->outputfile = argument[i + 1];
             check++;
         }
-        if(strcmp("-r", argument[i + 1]) == 0)
+        if(strncmp("-r", argument[i], 2) == 0)
         {
             info->mode = 1;
         }
@@ -156,11 +156,8 @@ int Compare(const void *s1, const void *s2)
     return 0;
 }
 
-int CompareFromEnd(const void *s1, const void *s2)
+int CompareFromEnd(struct Strings *z1, struct Strings *z2)
 {
-    const struct Strings *z1 = (const struct Strings *)s1;
-    const struct Strings *z2 = (const struct Strings *)s2;
-
     for(int i = z1->size, j = z2->size; i >= 0 && j >= 0; i--, j--)
     {
         while(!isalpha(z1->string[i]))
@@ -182,6 +179,73 @@ int CompareFromEnd(const void *s1, const void *s2)
         }  
     }  
     return 0;
+}
+
+void swap(char *s1, char *s2)
+{
+    char * temp = s1; 
+    s1 = s2;
+    s2 = temp;
+}
+
+void quick_sort(struct Strings* p, int left, int right,  int (*CompareFromEnd)(struct Strings *z1, struct Strings *z2)) 
+{
+    int aaa = right - left;
+
+    if(aaa == 2)
+    {
+        if(CompareFromEnd(&p[left], &p[left + 1]) < 0 )
+        {
+            swap(p[left].string, p[left + 1].string);
+        }
+
+        if(CompareFromEnd(&p[left + 1], &p[right]) < 0)
+        {
+            swap(p[left + 1].string, p[right].string);
+        }
+        if(CompareFromEnd(&p[left], &p[right]) < 0)
+        {
+            swap(p[left].string, p[right].string);
+        }
+    }
+    else if(aaa == 1)
+    {
+        if(CompareFromEnd(&p[left], &p[right]) < 0)
+        {
+            swap(p[left].string, p[right].string);
+        }
+    }
+
+    struct Strings *pivot = &p[(left + right) / 2];
+    int i = left;   
+    int j = right;
+
+    while (i <= j) 
+    {
+        while(CompareFromEnd(&p[i], pivot) < 0) 
+        {
+            ++i;
+        }
+        while(CompareFromEnd(&p[j], pivot) > 0) 
+        {
+            --j;
+        }
+        if (i <= j) 
+        {
+            swap(p[i].string, p[j].string);
+            ++i;
+            --j;
+        }
+    }
+
+    if (left < j) 
+    {
+        quick_sort(p, left, j, CompareFromEnd);
+    }
+    if (i < right) 
+    {
+        quick_sort(p, i, right, CompareFromEnd);
+    }
 }
 
 int LowerCase(char c)
@@ -219,4 +283,4 @@ void PrintStrings(struct Strings *arr, int size, const char *name, int mode)
     }
     
     fclose(fp);
-}  
+} // printstrings needs to receive file name; -> make func that opens in "W" / "r" mode file 

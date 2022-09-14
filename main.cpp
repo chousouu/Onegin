@@ -25,7 +25,9 @@ int main(int argc, const char **argv)
         }
         else 
         {
-            qsort(arr, size, sizeof(struct Strings), CompareFromEnd);
+            // qsort(arr, size, sizeof(struct Strings), CompareFromEnd);
+            quick_sort(arr, 0, size - 1, CompareFromEnd);
+            printf("WORK");
         }
 
         PrintStrings(arr, size, info.outputfile, info.mode);
@@ -41,4 +43,16 @@ int main(int argc, const char **argv)
             printf("Put -o filename.txt\n");
         }
     }
+
+
+
+
+//  /*
+//     MSort(arr, 0, size - 1);
+//     printf("SORT");
+// */
+//     PrintStrings(arr, size);
+//     printf("PRINTED");
+//     free(arr);
+
 }
