@@ -195,14 +195,12 @@ void quick_sort(struct Strings* p, int left, int right,  int (*CompareFromEnd)(c
 {
     int middle = (left + right) / 2;
     struct Strings pivot = p[middle];
-    printf("====\n pivot %s\n ====\n", pivot.string);
     char *lesser = NULL;
     char *bigger = NULL;
     
     int aaa = right - left;
     if(aaa == 2)
     {
-        printf("aaa =2\n" );
         if(CompareFromEnd(p + left, p + left + 1) < 0 )
         {
             swap(p[left].string, p[left + 1].string);
@@ -240,13 +238,10 @@ void quick_sort(struct Strings* p, int left, int right,  int (*CompareFromEnd)(c
             do
             {
                 i++;
-            printf("%d ", i);
             } while (CompareFromEnd(p + i, &pivot) < 0 && i <= j);
 
             lesser = p[i].string;
-            printf("\nlesser == %s\n", lesser);
 
-            printf(" j = ");
             do
             {
                 j--;
@@ -254,12 +249,10 @@ void quick_sort(struct Strings* p, int left, int right,  int (*CompareFromEnd)(c
             } while (CompareFromEnd(p + right - j, &pivot) < 0 && i <= j);
 
             bigger = p[j].string;
-            printf("\nBIGGER == %s\n", bigger);
 
             if(bigger != NULL && lesser != NULL)
             {
                 swap(lesser, bigger);
-                printf("swapped : %s / %s\n", lesser, bigger);
                 bigger = NULL;
                 lesser = NULL;
             }
@@ -277,10 +270,9 @@ void quick_sort(struct Strings* p, int left, int right,  int (*CompareFromEnd)(c
         }
     }
 
-    printf("qsort left %d %d \n", 0, middle);
     quick_sort(p, 0, middle, CompareFromEnd);
-    printf("qsort right %d %d \n", middle + 1, right);
-    quick_sort(p, middle + 1, right, CompareFromEnd);
+    quick_sort(p, middle, right, CompareFromEnd);
+    return;
 }
 
 int LowerCase(char c)
