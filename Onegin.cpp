@@ -93,7 +93,7 @@ Strings *FillInStruct(char *buffer, int size)
 
 int CountSymbols(const char *name)
 {
-    struct stat buff;
+    struct stat buff = {};
     stat(name, &buff);
     
     return buff.st_size; 
@@ -193,11 +193,16 @@ void swap(char *s1, char *s2)
 
 void quick_sort(struct Strings* p, int left, int right,  int (*CompareFromEnd)(const void *z1, const void *z2))
 {
+    int middle = (left + right) / 2;
+    struct Strings pivot = p[middle];
+    printf("====\n pivot %s\n ====\n", pivot.string);
+    char *lesser = NULL;
+    char *bigger = NULL;
+    
     int aaa = right - left;
-    // printf("ENTERED\n");
-
     if(aaa == 2)
     {
+        printf("aaa =2\n" );
         if(CompareFromEnd(p + left, p + left + 1) < 0 )
         {
             swap(p[left].string, p[left + 1].string);
@@ -211,6 +216,7 @@ void quick_sort(struct Strings* p, int left, int right,  int (*CompareFromEnd)(c
         {
             swap(p[left].string, p[right].string);
         }
+        return;
     }
     else if(aaa == 1)
     {
@@ -218,42 +224,63 @@ void quick_sort(struct Strings* p, int left, int right,  int (*CompareFromEnd)(c
         {
             swap(p[left].string, p[right].string);
         }
+        return;
     }
-
-    // printf("AAA\n");
-    struct Strings *pivot = p + ((left + right) / 2);
-    int i = left;   
-    int j = right;
-
-    while (i <= j) 
+    else if(aaa == 0)
     {
-        while(CompareFromEnd(p + i, pivot) < 0) 
+        return;
+    }
+    else 
+    {
+        int i = 0;
+        int j = right;
+        while (i <= j)
         {
-            ++i;
+            printf("i =");
+            do
+            {
+                i++;
+            printf("%d ", i);
+            } while (CompareFromEnd(p + i, &pivot) < 0 && i <= j);
+
+            lesser = p[i].string;
+            printf("\nlesser == %s\n", lesser);
+
+            printf(" j = ");
+            do
+            {
+                j--;
+                printf("%d ", j);
+            } while (CompareFromEnd(p + right - j, &pivot) < 0 && i <= j);
+
+            bigger = p[j].string;
+            printf("\nBIGGER == %s\n", bigger);
+
+            if(bigger != NULL && lesser != NULL)
+            {
+                swap(lesser, bigger);
+                printf("swapped : %s / %s\n", lesser, bigger);
+                bigger = NULL;
+                lesser = NULL;
+            }
         }
-        while(CompareFromEnd(p + j, pivot) > 0) 
+
+        if(bigger != NULL)
         {
-            --j;
+            swap(pivot.string, bigger);
+            bigger = NULL;
         }
-        if (i <= j) 
+        if(lesser != NULL)
         {
-            swap(p[i].string, p[j].string);
-            ++i;
-            --j;
+            swap(pivot.string, lesser);
+            lesser = NULL;
         }
     }
 
-    // printf("while ij\n");
-
-    if (left < j) 
-    {
-        quick_sort(p, left, j, CompareFromEnd);
-    }
-    if (i < right) 
-    {
-        quick_sort(p, i, right, CompareFromEnd);
-    }
-    // printf("END\n");
+    printf("qsort left %d %d \n", 0, middle);
+    quick_sort(p, 0, middle, CompareFromEnd);
+    printf("qsort right %d %d \n", middle + 1, right);
+    quick_sort(p, middle + 1, right, CompareFromEnd);
 }
 
 int LowerCase(char c)
