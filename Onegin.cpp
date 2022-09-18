@@ -1,5 +1,39 @@
 #include "Onegin.h"
 
+int AnalyzeInput(int argcount, const char **argument, struct Input *info)
+{
+    int check = 0;
+    info->mode = 0; // normal sort
+    for (int i = 1; i < argcount; i++)
+    {
+        if(strncmp("-i", argument[i], 2) == 0)
+        {
+            if(strncmp("-o", argument[i + 1], 2) == 0)
+            {
+                printf("You cannot have %s as input file name!\n", argument[i + 1]);
+                return check;
+            }
+            info->inputfile = argument[i + 1];
+            check++;
+        }
+        if(strncmp("-o", argument[i], 2) == 0)
+        {
+            if(strncmp("-i", argument[i + 1], 2) == 0)
+            {
+                printf("You cannot have %s as output file name!\n", argument[i + 1]);
+                return check;
+            }
+            info->outputfile = argument[i + 1];
+            check++;
+        }
+        if(strncmp("-r", argument[i], 2) == 0)
+        {
+            info->mode = 1;
+        }
+    }
+    return check;    
+}
+
 void OddSpaceRemoveArray(char *buffer)
 {
     char c = 0; 
@@ -14,7 +48,6 @@ void OddSpaceRemoveArray(char *buffer)
             buffer[k] = c;
             k++;
             check = 1;
-            
         }
         else if(c == '\n' && check == 1)
         {
@@ -38,7 +71,7 @@ void OddSpaceRemoveArray(char *buffer)
     buffer[k] = '\n';
 }
 
-char *ReadToBuffer(FILE *fp, int size) //readtobuffer
+char *ReadToBuffer(FILE *fp, int size) 
 {
     char *buffer = (char *)calloc(size, sizeof(char));
 
@@ -46,57 +79,6 @@ char *ReadToBuffer(FILE *fp, int size) //readtobuffer
     buffer[PutZero] = '\0';
 
     return buffer;
-}
-
-int AnalyzeInput(int argcount, const char **argument, struct Input *info)
-{
-    int check = 0;
-    info->mode = 0; // normal sort
-    for (int i = 1; i < argcount; i++)
-    {
-        if(strncmp("-i", argument[i], 2) == 0)
-        {
-            info->inputfile = argument[i + 1];
-            check++;
-        }
-        if(strncmp("-o", argument[i], 2) == 0)
-        {
-            info->outputfile = argument[i + 1];
-            check++;
-        }
-        if(strncmp("-r", argument[i], 2) == 0)
-        {
-            info->mode = 1;
-        }
-    }
-    return check;    
-}
-
-char *OpenFile(const char *name)
-{
-    FILE *fp = fopen(name, "r");
-    if(fp == NULL)
-    {
-        printf("Could not open the file \"%s.txt\"\n", name);
-    }
-    return ReadToBuffer(fp, CountSymbols(name));
-}
-
-Strings *FillInStruct(char *buffer, int size)
-{
-    struct Strings * arr = (struct Strings *)calloc(size, sizeof(struct Strings)); 
-
-    GetString(buffer, arr, size);
-
-    return arr;
-}
-
-int CountSymbols(const char *name)
-{
-    struct stat buff = {};
-    stat(name, &buff);
-    
-    return buff.st_size; 
 }
 
 void GetString(char *buffer, struct Strings *arr, int size)
@@ -114,6 +96,14 @@ void GetString(char *buffer, struct Strings *arr, int size)
     }
 }
 
+int CountSymbols(const char *name)
+{
+    struct stat buff = {};
+    stat(name, &buff);
+    
+    return buff.st_size; 
+}
+
 int CountString(char *buffer)
 {
     int count = 0;
@@ -126,6 +116,15 @@ int CountString(char *buffer)
     }
 
     return count; 
+}
+
+Strings *FillInStruct(char *buffer, int size)
+{
+    struct Strings * arr = (struct Strings *)calloc(size, sizeof(struct Strings)); 
+
+    GetString(buffer, arr, size);
+
+    return arr;
 }
 
 int Compare(const void *s1, const void *s2)
@@ -161,7 +160,7 @@ int CompareFromEnd(const void *s1, const void *s2)
     const struct Strings *z1 = (const struct Strings *)s1; 
     const struct Strings *z2 = (const struct Strings *)s2;
 
-    for(int i = z1->size, j = z2->size; i >= 0 && j >= 0; i--, j--)
+    for(int i = (z1->size - 1), j = (z2->size - 1); i >= 0 && j >= 0; i--, j--)
     {
         while(!isalpha(z1->string[i]))
         {
@@ -177,102 +176,71 @@ int CompareFromEnd(const void *s1, const void *s2)
         int razn = char1 - char2;
 
         if(razn)
-        {
-            return char1 - char2;
+        {  
+            return razn;
         }  
     }  
     return 0;
 }
 
-void swap(char *s1, char *s2)
+void bubblesort(struct Strings* p, int sizeofArray, int size, int (*Comp)(const void *z1, const void *z2))
 {
-    char * temp = s1; 
-    s1 = s2;
-    s2 = temp;
-}
-
-void quick_sort(struct Strings* p, int left, int right,  int (*CompareFromEnd)(const void *z1, const void *z2))
-{
-    int middle = (left + right) / 2;
-    struct Strings pivot = p[middle];
-    char *lesser = NULL;
-    char *bigger = NULL;
-    
-    int aaa = right - left;
-    if(aaa == 2)
+    for(int i = 0; i < size - 1; i++)
     {
-        if(CompareFromEnd(p + left, p + left + 1) < 0 )
+        for(int j = 0; j < size - i - 1; j++)
         {
-            swap(p[left].string, p[left + 1].string);
-        }
-
-        if(CompareFromEnd(p + left + 1, p + right) < 0)
-        {
-            swap(p[left + 1].string, p[right].string);
-        }
-        if(CompareFromEnd(p + left, p + right) < 0)
-        {
-            swap(p[left].string, p[right].string);
-        }
-        return;
-    }
-    else if(aaa == 1)
-    {
-        if(CompareFromEnd(p + left, p + right) < 0)
-        {
-            swap(p[left].string, p[right].string);
-        }
-        return;
-    }
-    else if(aaa == 0)
-    {
-        return;
-    }
-    else 
-    {
-        int i = 0;
-        int j = right;
-        while (i <= j)
-        {
-            printf("i =");
-            do
+            if(Comp(p + j, p + (j + 1) ) > 0)
             {
-                i++;
-            } while (CompareFromEnd(p + i, &pivot) < 0 && i <= j);
-
-            lesser = p[i].string;
-
-            do
-            {
-                j--;
-                printf("%d ", j);
-            } while (CompareFromEnd(p + right - j, &pivot) < 0 && i <= j);
-
-            bigger = p[j].string;
-
-            if(bigger != NULL && lesser != NULL)
-            {
-                swap(lesser, bigger);
-                bigger = NULL;
-                lesser = NULL;
+                swap(p + j, p + (j + 1));
             }
         }
+    }   
+}   
 
-        if(bigger != NULL)
+void quick_sort(struct Strings* p, int left, int right,  int (*CompareFromEnd)(const void *z1, const void *z2)) 
+{
+    struct Strings *pivot = &p[(left + right) / 2];
+    int i = left;   
+    int j = right;
+
+    while (i <= j) 
+    {
+        while(CompareFromEnd(p + i, pivot) < 0) 
         {
-            swap(pivot.string, bigger);
-            bigger = NULL;
+            ++i;
         }
-        if(lesser != NULL)
+        while(CompareFromEnd(p + j, pivot) > 0) 
         {
-            swap(pivot.string, lesser);
-            lesser = NULL;
+            --j;
+        }
+        if (i <= j) 
+        {
+            swap(p + i, p + j);
+            ++i;
+            --j;
         }
     }
 
-    quick_sort(p, 0, middle, CompareFromEnd);
-    quick_sort(p, middle, right, CompareFromEnd);
-    return;
+    if (left < j) 
+    {
+        quick_sort(p, left, j, CompareFromEnd);
+    }
+    if (i < right) 
+    {
+        quick_sort(p, i, right, CompareFromEnd);
+    }
+}
+
+void swap(struct Strings *s1, struct Strings *s2)
+{
+    char *temp = s1->string; 
+    int temp2 = s1->size;
+
+    s1->string = s2->string;
+    s1->size = s2->size;
+    
+    s2->string = temp;
+    s2->size = temp2;
 }
 
 int LowerCase(char c)
@@ -310,4 +278,20 @@ void PrintStrings(struct Strings *arr, int size, const char *name, int mode)
     }
     
     fclose(fp);
-} // printstrings needs to receive file name; -> make func that opens in "W" / "r" mode file 
+} 
+
+char *OpenFile(const char *name)
+{
+    FILE *fp = fopen(name, "r");
+    if(fp == NULL)
+    {
+        printf("Could not open the file \"%s.txt\"\n", name);
+    }
+    return ReadToBuffer(fp, CountSymbols(name));
+}
+
+void FreeMemory(struct Strings *arr)
+{
+    free(arr->string);
+    free(arr);
+}
