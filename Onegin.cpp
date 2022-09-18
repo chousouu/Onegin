@@ -192,7 +192,7 @@ void bubblesort(struct Strings* p, int sizeofArray, int size, int (*Comp)(const 
         {
             if(Comp(p + j, p + (j + 1) ) > 0)
             {
-                SwapStruct(p + j, p + (j + 1));
+                SwapString(p + j, p + (j + 1));
             }
         }
     }
@@ -216,7 +216,7 @@ void QuickSort(struct Strings* p, int left, int right, int (*Compare)(const void
         }
         if (i <= j)
         {
-            SwapStruct(p + i, p + j);
+            SwapString(p + i, p + j);
             ++i;
             --j;
         }
