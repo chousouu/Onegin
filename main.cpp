@@ -9,28 +9,32 @@ int main(int argc, const char **argv)
         0    
     }; 
 
-    int count = AnalyzeInput(argc, argv, &info);
+    int count = ParseArguments(argc, argv, &info);
 
     if (count == 2)
     {
         char *buffer = OpenFile(info.inputfile);
-        OddSpaceRemoveArray(buffer);
-
-        int size = CountString(buffer);
-        Strings *arr = FillInStruct(buffer, size);
         
-        if(info.mode == 0)
+        if(buffer != NULL)
         {
-            qsort(arr, size, sizeof(struct Strings), Compare);
-        }
-        else 
-        {
-            quick_sort(arr, 0, size - 1, CompareFromEnd);
-        }
+            OddSpaceRemoveArray(buffer);
 
-        PrintStrings(arr, size, info.outputfile, info.mode);
+            int size = CountString(buffer);
+            Strings *arr = FillInStruct(buffer, size);
 
-        FreeMemory(arr);
+            if(info.mode == 0)
+            {
+                qsort(arr, size, sizeof(struct Strings), Compare);
+            }
+            else 
+            {
+                QuickSort(arr, 0, size - 1, CompareFromEnd);
+            }
+
+            PrintStrings(arr, size, info.outputfile, info.mode);
+
+            FreeMemory(arr);
+        }
     }
     else 
     {
