@@ -232,7 +232,7 @@ void QuickSort(struct Strings* p, int left, int right, int (*Compare)(const void
     }
 }
 
-void SwapStruct(struct Strings *s1, struct Strings *s2)
+void SwapString(struct Strings *s1, struct Strings *s2)
 {
     struct Strings temp = *s1;
     *s1 = *s2;
