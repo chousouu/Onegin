@@ -18,7 +18,7 @@ int Compare(const void *s1, const void *s2);
 int CompareFromEnd(const void *s1, const void *s2);
 void bubblesort(struct Strings* p, int sizeofArray, int size, int (*Comp)(const void *z1, const void *z2));
 void QuickSort(struct Strings* p, int left, int right,  int (*CompareFromEnd)(const void *z1, const void *z2)); 
-void SwapStruct(struct Strings *s1, struct Strings *s2);
+void SwapString(struct Strings *s1, struct Strings *s2);
 char LowerCase(char c);
 void PrintStrings(struct Strings *arr, int size, const char *name, int mode);
 char *OpenFile(const char *name);
